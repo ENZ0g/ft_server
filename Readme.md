@@ -1,7 +1,7 @@
 # ft_server
 
 Здесь я опишу основные моменты проекта, который я выполнял на Ubuntu 20.04 LTS. 
-Чтобы получить больше информации, можете воспользоваться моим [списком вдохновения](#source_info).
+Чтобы получить больше информации, можете воспользоваться моим [списком вдохновения](#sourceinfo).
 
 >Узнать свой дистрибутив можно с помощью команды `lsb_release -a`
 
@@ -10,7 +10,7 @@
 
 1. Устанавливаем LEMP
 2. [Запускаем WordPress](#wordpress)
-3. [Подключаем SSL](#SSL)
+3. [Подключаем SSL](#addssl)
 4. [Подключаем phpMyAdmin](#phpMyAdmin)
 5. [Подключаем autoindex](#autoindex)
 
@@ -168,7 +168,7 @@ echo date("Y-m-d H:i:s");
 
 После перезапуска сервера, проверьте, что по запросу `localhost` отображается дата и время.
 
-#### <a id='#wordpress'></a>Wordpress
+#### <a id='wordpress'></a>Wordpress
 
 Скачиваем архив последней версии с официального сайта:
 
@@ -272,7 +272,7 @@ $ sudo apt install php-curl php-gd php-intl php-mbstring php-soap php-xml php-xm
 
 Теперь можно заходить на `localhost`, где нужно будет завершить настройки уже в веб-интерфейсе.
 
-#### <a id='#SSL'></a>Добавляем SSL
+#### <a id='addssl'></a>Добавляем SSL
 
 Генерируем сертификат и ключ:
 
@@ -329,7 +329,7 @@ server {
 Теперь, `localhost` доступен через https, правда, браузеры всё равно будут ругаться не доверяя
  самоподписанному сертификату.
 
-#### <a id='#phpMyAdmin'></a>PhpMyAdmin
+#### <a id='phpMyAdmin'></a>PhpMyAdmin
 
 PhpMyAdmin - веб интерфейс для работы с базой данных. Все, что нужно сделать - скачать архив 
 с приложением и сделать несколько настроек.
@@ -414,7 +414,7 @@ $cfg['Servers'][$i]['AllowRoot'] = false;
 >слева в дереве нажмите плюс рядом с `testdb` и выберите `wp_options`. Две первые строчки 
 >`siteurl` и `home` обновите на `http://localhost/wordpress_test` (с помощью кнопки edit)
 
-#### <a id='#phpMyAdmin'></a>Autoindex
+#### <a id='autoindex'></a>Autoindex
 
 При включеном autoindex, nginx при невозможности найти в сопоставленной запросу директории 
 `index.html` или того, что указано в директиве `index` в обработчике этого запроса, отображает 
@@ -451,7 +451,7 @@ server {
 
 Перезагружаем nginx и пробуем.
 
-<a id='#source_info'></a> Основными источниками информации при выполнении этого проекта были:
+<a id='sourceinfo'></a> Основными источниками информации при выполнении этого проекта были:
 1. [Статья по установке LEMP на Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04)
 2. [Статья по установке LEMP на Debian](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10)
 3. [Статья по запуску Wordpress на LEMP](https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-lemp-nginx-mariadb-and-php-on-debian-10)
