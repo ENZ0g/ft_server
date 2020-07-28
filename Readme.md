@@ -168,7 +168,7 @@ echo date("Y-m-d H:i:s");
 
 После перезапуска сервера, проверьте, что по запросу `localhost` отображается дата и время.
 
-#### <a id='#SSL'></a>Wordpress
+#### <a id='#wordpress'></a>Wordpress
 
 Скачиваем архив последней версии с официального сайта:
 
@@ -451,7 +451,7 @@ server {
 
 Перезагружаем nginx и пробуем.
 
-<a id='#source_info'></a>Основными источниками информации при выполнении этого проекта были:
+<a id='#source_info'></a> Основными источниками информации при выполнении этого проекта были:
 1. [Статья по установке LEMP на Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04)
 2. [Статья по установке LEMP на Debian](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10)
 3. [Статья по запуску Wordpress на LEMP](https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-lemp-nginx-mariadb-and-php-on-debian-10)
