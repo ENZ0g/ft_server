@@ -13,6 +13,7 @@
 3. [Подключаем SSL](#addssl)
 4. [Подключаем phpMyAdmin](#phpMyAdmin)
 5. [Подключаем autoindex](#autoindex)
+6. [Docker](#docker)
 
 #### Устанавливаем LEMP
 
@@ -408,7 +409,7 @@ $cfg['Servers'][$i]['AllowRoot'] = false;
 
 Перезапускайте nginx и можно проверять `localhost/wordpress_test/` и `localhost/phpmyadmin/`.
 
->Напомню, user: testuser, password: test_password
+>Напомню данные для phpMyAdmin, user: testuser, password: test_password
 
 >Если у вас, как и у меня сломался wordpress (потерялись css), то зайдите на `localhost/phpmyadmin/`,
 >слева в дереве нажмите плюс рядом с `testdb` и выберите `wp_options`. Две первые строчки 
@@ -450,6 +451,95 @@ server {
 ```  
 
 Перезагружаем nginx и пробуем.
+
+#### <a id='docker'></a>Docker
+
+Контейнер - это образ, который работает. Образ - собранное по инструкции `Dokerfile` окружение и
+наш код.
+
+Т.е. все начинается с `Dockerfile`:
+
+```
+FROM debian:buster
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get install -y curl
+
+# --- NGINX ---
+RUN apt-get install -y nginx
+WORKDIR /etc/nginx/sites-available/
+COPY ./srcs/nginx_ai_on.conf .
+RUN ln -s /etc/nginx/sites-available/nginx_ai_on.conf /etc/nginx/sites-enabled/
+WORKDIR /
+COPY ./srcs/nginx_ai_on.conf .
+COPY ./srcs/nginx_ai_off.conf .
+COPY ./srcs/autoindex_off.sh .
+COPY ./srcs/autoindex_on.sh .
+
+# --- MARIADB ---
+RUN apt-get install -y mariadb-server
+WORKDIR /
+COPY ./srcs/create_test_db.sql .
+COPY ./srcs/ft_server_db_dump.sql .
+RUN service mysql start && mysql < create_test_db.sql && mysql testdb < ft_server_db_dump.sql
+
+# --- WORDPRESS ---
+RUN apt-get install -y php-fpm php-mysql
+RUN apt-get install -y php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip
+WORKDIR /var/www/ft_server
+RUN curl -LO https://wordpress.org/latest.tar.gz
+RUN tar xzf latest.tar.gz
+RUN rm -rf latest.tar.gz
+RUN chown -R www-data:www-data /var/www/ft_server/wordpress
+WORKDIR /var/www/ft_server/wordpress
+COPY ./srcs/wp-config.php .
+
+# --- SSL ---
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/nginx-selfsigned.key \
+    -out /etc/ssl/certs/nginx-selfsigned.crt \
+    -subj "/C=RU/ST=Moscow/L=Moscow/O=21/OU=school/CN=localhost"
+
+# --- PHPMYADMIN ---
+WORKDIR /var/www/ft_server
+RUN curl -LO https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-english.tar.gz
+RUN tar xzf phpMyAdmin-5.0.2-english.tar.gz
+RUN mkdir phpmyadmin
+RUN mv phpMyAdmin-5.0.2-english/* phpmyadmin/
+RUN rm -rf phpMyAdmin-5.0.2-english phpMyAdmin-5.0.2-english.tar.gz
+COPY ./srcs/config.inc.php ./phpmyadmin/
+
+EXPOSE 80 443
+
+WORKDIR /
+COPY ./srcs/start_services.sh .
+ENTRYPOINT ["bash", "start_services.sh"]
+```
+
+`Dockerfile` это по сути перечесление тех команд, которые мы выполняли локально. Только теперь они
+будут выполняться при построении docker image. Команда `FROM` - базовый слой нашего образа, согласно
+задания `debian:buster`. Далее все понятно по командам, устанавливаем необходимые программы, конфигурационные
+файлы вставляем свои.
+
+Собираем образ командой:
+
+`$ sudo docker build -t ft_server .`
+
+После того, как образ создан, запускаем контейнер:
+
+`$ sudo docker run -it -p 80:80 -p 443:443 ft_server`
+
+После запуска будет доступен терминал (за это отвечают флаги `-it`), в котором можно менять настройку
+ autoindex командами `bash /autoindex_on.sh` и `bash /autoindex_off.sh`. Увидеть всю красоту можно в 
+ браузере по адресам `localhost` (будет ошибка, если autoindex отключен, и отображение директорий, если 
+ включен), `localhost/wordpress`, `localhost/phpmyadmin`.
+ 
+ Выйти из терминала контейнера можно последовательным нажатием комбинаций  `ctrl+p` `ctrl+q`.\
+ Войти обратно командой:
+ 
+ `$ sudo docker exec -it <container_id> bash`
+ 
+ Соответственно, вместо `container_id` ставим актуальный id.
 
 <a id='sourceinfo'></a> Основными источниками информации при выполнении этого проекта были:
 1. [Статья по установке LEMP на Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04)
