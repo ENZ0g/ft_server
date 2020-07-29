@@ -6,7 +6,7 @@
 #    By: rhullen <rhullen@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/20 18:48:15 by rhullen           #+#    #+#              #
-#    Updated: 2020/07/20 20:00:38 by rhullen          ###   ########.fr        #
+#    Updated: 2020/07/29 23:02:55 by rhullen          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,3 +65,4 @@ EXPOSE 80 443
 WORKDIR /
 COPY ./srcs/start_services.sh .
 ENTRYPOINT ["bash", "start_services.sh"]
+
